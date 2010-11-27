@@ -729,45 +729,18 @@ class SimpleCFD {
    */
   public static function getCertificate ( $cer_path, $to_string = true )
   {
-    $cmd = 'openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey';
-    exec( $cmd, $result );
-
-    $response = '';
-
-    if ( $to_string ) {
-
-      if ( $result > 1 ) {
-        $response = '';
-        foreach ( $result as $line ) {
-          $response .= $line."\n";
-        }
-      } else {
-        $response = $result[0];
-      }
-
-    } else {
-
-      $size = sizeof( $result );
-      $flag = false;
-
-      for ( $i = 0; $i < $size; ++$i ) {
-        if ( strstr( $result[$i], "END CERTIFICATE" ) ) {
-          $flag = false;
-        }
-        if ( $flag ) {
-          $response .= trim( $result[$i] );
-        }
-        if ( strstr( $result[$i],"BEGIN CERTIFICATE" ) ) {
-          $flag = true;
-        }
-      }
-
-      unset( $flag );
-      unset( $size );
-      unset( $result );
-    }
-
-    return $response ? $response : false;
+	if($result = shell_exec('openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey')){
+		
+		if($to_string){
+			return $result;
+		}
+		$split = preg_split('/\n(-*(BEGIN|END)\sCERTIFICATE-*\n)/',$result);
+		
+		unset($result);
+		return $split[1];
+	}
+	
+    return FALSE;
   }
 
   /**
