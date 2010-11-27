@@ -1,12 +1,12 @@
 <?php
-// User vars
+// set User vars
 $password = 'a0123456789';
 $cer_path = 'aaa010101aaa_CSD_10.cer';
 $key_path = 'aaa010101aaa_CSD_10.key';
 //$noAprobacion = '';
 //$anoAprobacion = '';
 
-// CDF array
+// set CDF array
 $array['serie'] = 'A';
 //$array['noAprobacion'] = $noAprobacion;
 //$array['anoAprobacion'] = $anoAprobacion;
@@ -57,6 +57,8 @@ $array['Retencion'][0]['importe'] = 112;
 //$array['descuento'] = '';
 $array['total'] = 812;
 
+
+// calls SimpleCDF methods
 require_once '../SimpleCFD.php';
 
 $array['sello'] = SimpleCFD::signData( SimpleCFD::getPrivateKey( $key_path, $password ),
@@ -64,5 +66,6 @@ $array['sello'] = SimpleCFD::signData( SimpleCFD::getPrivateKey( $key_path, $pas
 //$array['noCertificado'] = '';
 $array['certificado'] = SimpleCFD::getCertificate( $cer_path, false );
 
+// prints the XML result
 echo SimpleCFD::getXML( $array );
 ?>

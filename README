@@ -1,0 +1,46 @@
+                          FacturaElectronica
+                              Version 0.1
+
+Copyright (C) 2010 Basilio Briceno Hernandez <bbh@tlalokes.org>
+
+These are the release notes for FacturaElectronica version 0.1.
+Read them carefully, as they tell you what this is all about,
+and what to do if something goes wrong.
+
+WHAT IS FACTURA ELECTRONICA?
+
+  The Mexican government (SAT) recently asked people to use electronically
+  signed XML files to progressively remove the use of paper fiscal bills.
+  In their web page (http://sat.gob.mx) they put the rules to sign, request
+  and provide this "new" electronic bills.
+
+  This is a PHP implementation that intends to provide tools to help people
+  to accomplish with this requirements requested by the Mexican government.
+
+  It is distributed under the GNU Lesser General Public License - see the
+  accompanying COPYING file for more details.
+
+ON WHAT IT RUNS?
+
+  You can run this on any hardware that runs PHP 5.2.x or higher.
+
+REQUIREMENTS
+
+  It requires the PHP binary extension OpenSSL and the OpenSSL program itself.
+  It has not been probed on Windows, so any information about how it works
+  on that platform will be appreciated.
+
+DOCUMENTATION:
+
+ - There is a lot of documentation available in the SAT web site
+   (http://sat.gob.mx) also there is an example of how to use it in the
+   directory "example".
+
+IF SOMETHING GOES WRONG:
+
+  Contact the author at bbh@tlalokes.org or throw his twitter accout @bbhx
+
+CREDITS
+
+  Thanks to Fernando Sanchez for providing help to write this project.
+  Thanks to the PHP Monterrey's User's Group for the help and fellowship.
