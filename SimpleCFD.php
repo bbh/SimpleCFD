@@ -765,32 +765,12 @@ class SimpleCFD {
    */
   public static function getSerialFromCertificate ( $cer_path )
   {
-    $cmd = 'openssl x509 -inform DER -outform PEM -in '.$cer_path.
-           ' -pubkey > '.$cer_path.'.pem';
-    exec( $cmd );
-    unset( $cmd );
-
-    exec( 'openssl x509 -in '.$cer_path.'.pem -serial -noout', $serial );
-
-    unlink( $cer_path.'.pem' );
-
-    if ( isset( $serial[0] ) && $serial[0] ) {
-
-      if ( preg_match( "/([0-9]{40})/", $serial[0], $match ) ) {
-
-        $array = explode( "-", chunk_split( $match[1], 2, "-" ) );
-
-        $response = '';
-        foreach ( $array as $value ) {
-          if ( $value ) {
-            $response .= chr( hexdec( $value ) );
-          }
-        }
-        unset( $array );
+    if ($serial = shell_exec('openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey | openssl x509 -serial -noout')) {
+      if ( preg_match( "/([0-9]{40})/",$serial, $match ) ) {
+		unset($serial);
+        return implode('',array_map('chr',array_map('hexdec',str_split($match[1],2))));
       }
-      unset( $serial );
     }
-
-    return isset( $response ) && $response ? $response : false;
+    return FALSE;
   }
 }
