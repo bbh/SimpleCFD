@@ -706,11 +706,14 @@ class SimpleCFD {
    */
   public static function getPrivateKey ( $key_path, $password )
   {
-    if($result = shell_exec('openssl pkcs8 -inform DER -in '.$key_path.' -passin pass:'.$password)){
-		return $result;
-	}
-	
-	return FALSE;
+    $cmd = 'openssl pkcs8 -inform DER -in '.$key_path.' -passin pass:'.$password;
+    if ( $result = shell_exec( $cmd ) ) {
+      unset( $cmd );
+
+      return $result;
+    }
+
+    return false;
   }
 
   /**
@@ -724,18 +727,22 @@ class SimpleCFD {
    */
   public static function getCertificate ( $cer_path, $to_string = true )
   {
-	if($result = shell_exec('openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey')){
-		
-		if($to_string){
-			return $result;
-		}
-		$split = preg_split('/\n(-*(BEGIN|END)\sCERTIFICATE-*\n)/',$result);
-		
-		unset($result);
-		return $split[1];
-	}
-	
-    return FALSE;
+    $cmd = 'openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey';
+    if ( $result = shell_exec( $cmd ) ) {
+      unset( $cmd );
+
+      if ( $to_string ) {
+
+        return $result;
+      }
+
+      $split = preg_split( '/\n(-*(BEGIN|END)\sCERTIFICATE-*\n)/', $result );
+      unset( $result );
+
+      return preg_replace( '/\n/', '', $split[1] );
+    }
+
+    return false;
   }
 
   /**
@@ -765,12 +772,18 @@ class SimpleCFD {
    */
   public static function getSerialFromCertificate ( $cer_path )
   {
-    if ($serial = shell_exec('openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey | openssl x509 -serial -noout')) {
-      if ( preg_match( "/([0-9]{40})/",$serial, $match ) ) {
-		unset($serial);
-        return implode('',array_map('chr',array_map('hexdec',str_split($match[1],2))));
+    $cmd = 'openssl x509 -inform DER -outform PEM -in '.$cer_path.' -pubkey | '.
+           'openssl x509 -serial -noout';
+    if ( $serial = shell_exec( $cmd ) ) {
+      unset( $cmd );
+
+      if ( preg_match( "/([0-9]{40})/", $serial, $match ) ) {
+        unset( $serial );
+
+        return implode( '', array_map( 'chr', array_map( 'hexdec', str_split( $match[1], 2 ) ) ) );
       }
     }
-    return FALSE;
+
+    return false;
   }
 }
