@@ -706,16 +706,11 @@ class SimpleCFD {
    */
   public static function getPrivateKey ( $key_path, $password )
   {
-    $cmd = 'openssl pkcs8 -inform DER -in '.$key_path.' -passin pass:'.$password;
-    exec( $cmd, $result );
-    if ( $result > 1 ) {
-      $response = '';
-      foreach ( $result as $line ) {
-        $response .= $line."\n";
-      }
-      return $response;
-    }
-    return $result[0];
+    if($result = shell_exec('openssl pkcs8 -inform DER -in '.$key_path.' -passin pass:'.$password)){
+		return $result;
+	}
+	
+	return FALSE;
   }
 
   /**
