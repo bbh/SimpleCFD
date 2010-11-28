@@ -158,7 +158,7 @@ class SimpleCFD {
     if ( isset( $data['DomicilioFiscal']['calle'] ) ) {
       $df_calle = $dom->createAttribute( 'calle' );
       $df->appendChild( $df_calle );
-      $df_calle->appendChild( $dom->createTextNode( $data['Emisor']['nombre'] ) );
+      $df_calle->appendChild( $dom->createTextNode( $data['DomicilioFiscal']['calle'] ) );
     }
 
     if ( isset( $data['DomicilioFiscal']['noExterior'] ) ) {
@@ -222,7 +222,7 @@ class SimpleCFD {
     if ( isset( $data['ExpedidoEn']['calle'] ) ) {
       $en_calle = $dom->createAttribute( 'calle' );
       $en->appendChild( $en_calle );
-      $en_calle->appendChild( $dom->createTextNode( $data['Emisor']['nombre'] ) );
+      $en_calle->appendChild( $dom->createTextNode( $data['ExpedidoEn']['calle'] ) );
     }
 
     if ( isset( $data['ExpedidoEn']['noExterior'] ) ) {
@@ -302,7 +302,7 @@ class SimpleCFD {
     if ( isset( $data['Domicilio']['calle'] ) ) {
       $d_calle = $dom->createAttribute( 'calle' );
       $d->appendChild( $d_calle );
-      $d_calle->appendChild( $dom->createTextNode( $data['Emisor']['nombre'] ) );
+      $d_calle->appendChild( $dom->createTextNode( $data['Domicilio']['calle'] ) );
     }
 
     if ( isset( $data['Domicilio']['noExterior'] ) ) {
