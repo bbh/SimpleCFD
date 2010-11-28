@@ -42,5 +42,6 @@ IF SOMETHING GOES WRONG:
 
 CREDITS
 
+  Thanks to Edgar Garcia for optimizing the openssl code.
   Thanks to Fernando Sanchez for providing help to write this project.
   Thanks to the PHP Monterrey's User's Group for the help and fellowship.
