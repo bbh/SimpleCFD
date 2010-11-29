@@ -34,7 +34,7 @@ class SimpleCFD {
    */
   public static function getXML ( array $data )
   {
-    $dom = new DOMDocument( '1.0', 'utf-8' );
+    $dom = new DOMDocument( '1.0', 'UTF-8' );
     $dom->formatOutput = true;
 
     // Comprobante
@@ -216,67 +216,70 @@ class SimpleCFD {
     }
 
     // ExpedidoEn
-    $en = $dom->createElement( 'ExpedidoEn' );
-    $e->appendChild( $en );
+    if ( isset( $data['ExpedidoEn'] ) ) {
 
-    if ( isset( $data['ExpedidoEn']['calle'] ) ) {
-      $en_calle = $dom->createAttribute( 'calle' );
-      $en->appendChild( $en_calle );
-      $en_calle->appendChild( $dom->createTextNode( $data['ExpedidoEn']['calle'] ) );
-    }
+      $en = $dom->createElement( 'ExpedidoEn' );
+      $e->appendChild( $en );
 
-    if ( isset( $data['ExpedidoEn']['noExterior'] ) ) {
-      $en_noExterior = $dom->createAttribute( 'noExterior' );
-      $en->appendChild( $en_noExterior );
-      $en_noExterior->appendChild( $dom->createTextNode( $data['ExpedidoEn']['noExterior'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['calle'] ) ) {
+        $en_calle = $dom->createAttribute( 'calle' );
+        $en->appendChild( $en_calle );
+        $en_calle->appendChild( $dom->createTextNode( $data['ExpedidoEn']['calle'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['noInterior'] ) ) {
-      $en_noInterior = $dom->createAttribute( 'noInterior' );
-      $en->appendChild( $en_noInterior );
-      $en_noInterior->appendChild( $dom->createTextNode( $data['ExpedidoEn']['noInterior'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['noExterior'] ) ) {
+        $en_noExterior = $dom->createAttribute( 'noExterior' );
+        $en->appendChild( $en_noExterior );
+        $en_noExterior->appendChild( $dom->createTextNode( $data['ExpedidoEn']['noExterior'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['colonia'] ) ) {
-      $en_colonia = $dom->createAttribute( 'colonia' );
-      $en->appendChild( $en_colonia );
-      $en_colonia->appendChild( $dom->createTextNode( $data['ExpedidoEn']['colonia'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['noInterior'] ) ) {
+        $en_noInterior = $dom->createAttribute( 'noInterior' );
+        $en->appendChild( $en_noInterior );
+        $en_noInterior->appendChild( $dom->createTextNode( $data['ExpedidoEn']['noInterior'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['localidad'] ) ) {
-      $en_localidad = $dom->createAttribute( 'localidad' );
-      $en->appendChild( $en_localidad );
-      $en_localidad->appendChild( $dom->createTextNode( $data['ExpedidoEn']['localidad'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['colonia'] ) ) {
+        $en_colonia = $dom->createAttribute( 'colonia' );
+        $en->appendChild( $en_colonia );
+        $en_colonia->appendChild( $dom->createTextNode( $data['ExpedidoEn']['colonia'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['referencia'] ) ) {
-      $en_referencia = $dom->createAttribute( 'referencia' );
-      $en->appendChild( $en_referencia );
-      $en_referencia->appendChild( $dom->createTextNode( $data['ExpedidoEn']['referencia'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['localidad'] ) ) {
+        $en_localidad = $dom->createAttribute( 'localidad' );
+        $en->appendChild( $en_localidad );
+        $en_localidad->appendChild( $dom->createTextNode( $data['ExpedidoEn']['localidad'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['municipio'] ) ) {
-      $en_municipio = $dom->createAttribute( 'municipio' );
-      $en->appendChild( $en_municipio );
-      $en_municipio->appendChild( $dom->createTextNode( $data['ExpedidoEn']['municipio'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['referencia'] ) ) {
+        $en_referencia = $dom->createAttribute( 'referencia' );
+        $en->appendChild( $en_referencia );
+        $en_referencia->appendChild( $dom->createTextNode( $data['ExpedidoEn']['referencia'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['estado'] ) ) {
-      $en_estado = $dom->createAttribute( 'estado' );
-      $en->appendChild( $en_estado );
-      $en_estado->appendChild( $dom->createTextNode( $data['ExpedidoEn']['estado'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['municipio'] ) ) {
+        $en_municipio = $dom->createAttribute( 'municipio' );
+        $en->appendChild( $en_municipio );
+        $en_municipio->appendChild( $dom->createTextNode( $data['ExpedidoEn']['municipio'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['pais'] ) ) {
-      $en_pais = $dom->createAttribute( 'pais' );
-      $en->appendChild( $en_pais );
-      $en_pais->appendChild( $dom->createTextNode( $data['ExpedidoEn']['pais'] ) );
-    }
+      if ( isset( $data['ExpedidoEn']['estado'] ) ) {
+        $en_estado = $dom->createAttribute( 'estado' );
+        $en->appendChild( $en_estado );
+        $en_estado->appendChild( $dom->createTextNode( $data['ExpedidoEn']['estado'] ) );
+      }
 
-    if ( isset( $data['ExpedidoEn']['codigoPostal'] ) ) {
-      $en_codigoPostal = $dom->createAttribute( 'codigoPostal' );
-      $en->appendChild( $en_codigoPostal );
-      $en_codigoPostal->appendChild( $dom->createTextNode( $data['ExpedidoEn']['codigoPostal'] ) );
+      if ( isset( $data['ExpedidoEn']['pais'] ) ) {
+        $en_pais = $dom->createAttribute( 'pais' );
+        $en->appendChild( $en_pais );
+        $en_pais->appendChild( $dom->createTextNode( $data['ExpedidoEn']['pais'] ) );
+      }
+
+      if ( isset( $data['ExpedidoEn']['codigoPostal'] ) ) {
+        $en_codigoPostal = $dom->createAttribute( 'codigoPostal' );
+        $en->appendChild( $en_codigoPostal );
+        $en_codigoPostal->appendChild( $dom->createTextNode( $data['ExpedidoEn']['codigoPostal'] ) );
+      }
     }
 
     // Receptor
@@ -297,7 +300,7 @@ class SimpleCFD {
 
     // Domicilio
     $d = $dom->createElement( 'Domicilio' );
-    $e->appendChild( $d );
+    $r->appendChild( $d );
 
     if ( isset( $data['Domicilio']['calle'] ) ) {
       $d_calle = $dom->createAttribute( 'calle' );
