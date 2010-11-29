@@ -26,7 +26,7 @@ $array['DomicilioFiscal']['estado'] = 'Nuevo León';
 $array['DomicilioFiscal']['pais'] = 'México';
 $array['DomicilioFiscal']['codigoPostal'] = 64000;
 
-$array['ExpedidoEn'] = $array['DomicilioFiscal'];
+//$array['ExpedidoEn'] = $array['DomicilioFiscal'];
 
 $array['Receptor']['rfc'] = 'AAAA000000XXX';
 $array['Receptor']['nombre'] = 'Nombre del Cliente';
@@ -63,7 +63,7 @@ require_once '../SimpleCFD.php';
 
 $array['sello'] = SimpleCFD::signData( SimpleCFD::getPrivateKey( $key_path, $password ),
                                        SimpleCFD::getOriginalString( $array ) );
-//$array['noCertificado'] = '';
+$array['noCertificado'] = SimpleCFD::getSerialFromCertificate( $cer_path );
 $array['certificado'] = SimpleCFD::getCertificate( $cer_path, false );
 
 // prints the XML result
