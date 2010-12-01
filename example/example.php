@@ -68,4 +68,5 @@ $array['certificado'] = SimpleCFD::getCertificate( $cer_path, false );
 
 // prints the XML result
 echo SimpleCFD::getXML( $array );
+//echo SimpleCFD::getPDF( $array );
 ?>

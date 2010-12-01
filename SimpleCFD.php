@@ -26,6 +26,110 @@
  */
 class SimpleCFD {
 
+  private static function encodeText( $text )
+  {
+    return html_entity_decode( htmlentities( $text, ENT_QUOTES, 'UTF-8' ),
+                               ENT_QUOTES, 'ISO-8859-1' );
+  }
+
+  public static function getPDF ( array &$data )
+  {
+    try {
+      $p = new PDFlib();
+
+      if ( $p->begin_document( "", "" ) == 0 ) {
+        die( "Error: " . $p->get_errmsg() );
+      }
+
+      $p->set_info( "Creator", "SimpleCFD.php" );
+      $p->set_info( "Author", $data['Emisor']['nombre'] );
+      $p->set_info( "Title", "Factura No. " . $data['folio'] );
+      $p->set_info( "Subject", "Factura emitada a ".$data['Receptor']['nombre']." el ".$data['fecha'] );
+
+      // set letter size
+      $p->begin_page_ext( 612, 792, "" );
+
+      $font = $p->load_font( "Helvetica-Bold", "iso8859-1", "" );
+
+      $p->setfont( $font, 16 );
+      $p->set_text_pos( 30, 750 );
+      $p->show( "Factura" );
+
+      // Emisor
+      $p->setfont( $font, 18 );
+      $p->set_text_pos( 30, 710 );
+      $p->show( self::encodeText( $data['Emisor']['nombre'] ) );
+
+      $p->setfont( $font, 14 );
+      $p->set_text_pos( 30, 680 );
+      $p->show( "RFC: ".self::encodeText( $data['Emisor']['rfc'] ) );
+
+      $p->setfont( $font, 12 );
+      $p->set_text_pos( 30, 660 );
+      $p->show( self::encodeText( $data['DomicilioFiscal']['calle']." No. ".
+                                  $data['DomicilioFiscal']['noExterior'] ) );
+
+      $p->setfont( $font, 12 );
+      $p->set_text_pos( 30, 645 );
+      $p->show( self::encodeText( $data['DomicilioFiscal']['colonia'] ) );
+
+      $p->setfont( $font, 12 );
+      $p->set_text_pos( 30, 630 );
+      $p->show( self::encodeText( $data['DomicilioFiscal']['municipio'] ) );
+
+      $p->setfont( $font, 12 );
+      $p->set_text_pos( 30, 615 );
+      $p->show( "C.P. ".$data['DomicilioFiscal']['codigoPostal'] );
+
+      $p->setfont( $font, 12 );
+      $p->set_text_pos( 30, 600 );
+      $p->show( self::encodeText( $data['DomicilioFiscal']['estado'] ) );
+
+      // Datos fiscales
+      $p->fit_textline( "Folio Fiscal:", 577, 762,
+                        "fontsize=10 position=right" );
+
+      $p->fit_textline( "No. de Serie del Certificado del SAT:", 577, 723,
+                        "fontsize=10 position=right" );
+
+      $p->fit_textline( $data['noCertificado'], 577, 708,
+                        "fontsize=9 position=right" );
+
+      $p->fit_textline( self::encodeText( "Fecha y hora de certificación:" ), 577, 684,
+                        "fontsize=10 position=right" );
+
+      // Receptor
+      $p->setfont( $font, 14 );
+      $p->set_text_pos( 30, 550 );
+      $p->show( "Receptor:" );
+
+      $p->setfont( $font, 13 );
+      $p->set_text_pos( 30, 525 );
+      $p->show( "RFC: ".self::encodeText( $data['Receptor']['rfc'] ) );
+
+      $p->end_page_ext( "" );
+
+      $p->end_document( "" );
+
+      $buf = $p->get_buffer();
+      $len = strlen( $buf );
+
+      header( "Content-type: application/pdf" );
+      header( "Content-Length: $len" );
+      header( "Content-Disposition: inline; filename=hello.pdf" );
+
+      print $buf;
+
+    } catch ( PDFlibException $e ) {
+      die( "PDFlib exception occurred in hello sample:\n" .
+      "[" . $e->get_errnum() . "] " . $e->get_apiname() . ": " .
+      $e->get_errmsg() . "\n");
+    } catch ( Exception $e ) {
+        die( $e );
+    }
+    unset( $p );
+  }
+
   /**
    * Trasforms a CFD array into a CFD XML
    *
@@ -500,7 +604,7 @@ class SimpleCFD {
     }
 
     // Traslados
-    if ( isset( $data['Traslados'] ) ) {
+    if ( isset( $data['Traslado'] ) ) {
 
       $ts = $dom->createElement( 'Traslados' );
       $im->appendChild( $ts );
@@ -519,7 +623,7 @@ class SimpleCFD {
         }
 
         if ( isset( $data['Traslado'][0]['tasa'] ) ) {
-          $ts_tasa = $dom->createAttribute( 'importe' );
+          $ts_tasa = $dom->createAttribute( 'tasa' );
           $tr->appendChild( $ts_tasa );
           $ts_tasa->appendChild( $dom->createTextNode( $data['Traslado'][0]['tasa'] ) );
         }
@@ -542,7 +646,7 @@ class SimpleCFD {
           }
 
           if ( isset( $data['Traslado'][0]['tasa'] ) ) {
-            $ts_tasa = $dom->createAttribute( 'importe' );
+            $ts_tasa = $dom->createAttribute( 'tasa' );
             $tr_{$i}->appendChild( $ts_tasa );
             $ts_tasa->appendChild( $dom->createTextNode( $data['Traslado'][0]['tasa'] ) );
           }
@@ -663,21 +767,20 @@ class SimpleCFD {
     unset( $count );
 
     // Retencion
-    if ( !isset( $data['Retencion'] ) ) {
-      die( 'You must provide at least one Retencion in your array'."\n" );
-    }
-    $count = count( $data['Retencion'] );
-    if ( $count == 2 ) {
-      $string .= isset( $data['Retencion'][0]['impuesto'] ) ? $data['Retencion'][0]['impuesto'].'|' : '';
-      $string .= isset( $data['Retencion'][0]['importe'] ) ? $data['Retencion'][0]['importe'].'|' : '';
-    } else {
-      for( $i = 0; $i < $count; ++$i ) {
-        $string .= isset( $data['Retencion'][$i]['impuesto'] ) ? $data['Retencion'][$i]['impuesto'].'|' : '';
-        $string .= isset( $data['Retencion'][$i]['importe'] ) ? $data['Retencion'][$i]['importe'].'|' : '';
+    if ( isset( $data['Retencion'] ) ) {
+      $count = count( $data['Retencion'] );
+      if ( $count == 2 ) {
+        $string .= isset( $data['Retencion'][0]['impuesto'] ) ? $data['Retencion'][0]['impuesto'].'|' : '';
+        $string .= isset( $data['Retencion'][0]['importe'] ) ? $data['Retencion'][0]['importe'].'|' : '';
+      } else {
+        for( $i = 0; $i < $count; ++$i ) {
+          $string .= isset( $data['Retencion'][$i]['impuesto'] ) ? $data['Retencion'][$i]['impuesto'].'|' : '';
+          $string .= isset( $data['Retencion'][$i]['importe'] ) ? $data['Retencion'][$i]['importe'].'|' : '';
+        }
       }
+      unset( $count );
+      $string .= isset( $data['Retencion']['totalImpuestosRetenidos'] ) ? $data['Retencion']['totalImpuestosRetenidos'].'|' : '';
     }
-    unset( $count );
-    $string .= isset( $data['Retencion']['totalImpuestosRetenidos'] ) ? $data['Retencion']['totalImpuestosRetenidos'].'|' : '';
 
     // Traslado
     if ( isset( $data['Traslado'] ) ) {
