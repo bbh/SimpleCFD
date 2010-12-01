@@ -177,9 +177,39 @@ class SimpleCFD {
       $p->lineto( 580, 585);
       $p->stroke();
 
-
       // Concepto
-      
+
+      // Cantidad
+      $p->fit_textline( "Cantidad", 30, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={50 10}" );
+      // line
+      $p->moveto( 90, 580 );
+      $p->lineto( 90, 350);
+      $p->stroke();
+      // Descripcion
+      $p->fit_textline( self::encText( "Descripción" ), 100, 565,
+                        "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={65 10}" );
+      // line
+      $p->moveto( 470, 580 );
+      $p->lineto( 470, 350);
+      $p->stroke();
+      // Precio
+      $p->fit_textline( "Precio", 483, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={35 10}" );
+      // line
+      $p->moveto( 530, 580 );
+      $p->lineto( 530, 350);
+      $p->stroke();
+      // Importe
+      $p->fit_textline( "Importe", 540, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={40 10}" );
+
+      // line
+      $p->moveto( 30, 555 );
+      $p->lineto( 580, 555);
+      $p->stroke();
+
       /*$count = count( $data['Concepto'] );
       if ( $count > 1 ) {
         for ( $i = 0; $i < $count; ++$i ) {
@@ -187,6 +217,54 @@ class SimpleCFD {
         }
       }*/
 
+      // line
+      $p->moveto( 30, 345 );
+      $p->lineto( 580, 345);
+      $p->stroke();
+
+      // noCertificado
+      $p->fit_textline( self::encText( "Número de Serie del Certificado:" ),
+                        30, 325, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={145 10}" );
+      $p->fit_textline( self::encText( $data['noCertificado'] ), 175, 325,
+                        "fontsize=9 position={bottom left} boxsize={100 10}" );
+
+      // cadenaOriginal
+      $p->fit_textline( "Cadena original:", 30, 300,
+                        "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={75 10}" );
+      $foo = self::encText( $data['cadenaOriginal'] );
+      $cad = explode( ":::", wordwrap( $foo,150,":::",true ) );
+      $count = count( $cad );
+      static $position_cad = 300;
+      for ( $i = 0; $i < $count; ++$i ) {
+        $position_cad -= 10;
+        $p->fit_textline( $cad[$i], 30, $position_cad,
+                         "fontsize=7 position={bottom left} boxsize={550 10}" );
+      }
+      unset( $count );
+
+      // certificado
+      $position_cer = $position_cad - 20;
+      $p->fit_textline( "Sello Digital:", 30, $position_cer,
+                        "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={60 10}" );
+      $cer = explode( ":::", wordwrap( $data['certificado'],115,":::",true ) );
+      $count = count( $cer );
+      $position = $position_cer;
+      for ( $i = 0; $i < $count; ++$i ) {
+        $position -= 10;
+        $p->fit_textline( self::encText( $cer[$i] ), 30, $position,
+                         "fontsize=7 position={bottom left} boxsize={550 10}" );
+      }
+      unset( $count );
+      unset( $cer );
+
+      // nota
+      $p->fit_textline( self::encText( "Este documento es una impresión de un ".
+                                       "comprobante fiscal digital " ), 150,
+                        $position - 30, "fontsize=10 ".
+                        "position={bottom left} boxsize={320 10}" );
 
       $p->end_page_ext( "" );
 
@@ -881,7 +959,7 @@ class SimpleCFD {
       $string .= isset( $data['Traslado']['totalImpuestosTraslados'] ) ? $data['Traslado']['totalImpuestosTraslados'].'|' : '';
     }
 
-    return utf8_encode( preg_replace( '/(.*)\|$/', '$1', $string ).'||' );
+    return preg_replace( '/(.*)\|$/', '$1', $string )."||";
   }
 
   /**
