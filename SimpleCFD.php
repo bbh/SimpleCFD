@@ -26,7 +26,7 @@
  */
 class SimpleCFD {
 
-  private static function encodeText( $text )
+  private static function encText( $text )
   {
     return html_entity_decode( htmlentities( $text, ENT_QUOTES, 'UTF-8' ),
                                ENT_QUOTES, 'ISO-8859-1' );
@@ -37,75 +37,156 @@ class SimpleCFD {
     try {
       $p = new PDFlib();
 
+      $p->set_parameter("errorpolicy", "return");
+
       if ( $p->begin_document( "", "" ) == 0 ) {
         die( "Error: " . $p->get_errmsg() );
       }
 
       $p->set_info( "Creator", "SimpleCFD.php" );
-      $p->set_info( "Author", $data['Emisor']['nombre'] );
+      $p->set_info( "Author", self::encText( $data['Emisor']['nombre'] ) );
       $p->set_info( "Title", "Factura No. " . $data['folio'] );
-      $p->set_info( "Subject", "Factura emitada a ".$data['Receptor']['nombre']." el ".$data['fecha'] );
+      $p->set_info( "Subject", "Factura emitada a ".
+                               self::encText( $data['Receptor']['nombre'] ).
+                               " el ".$data['fecha'] );
 
       // set letter size
       $p->begin_page_ext( 612, 792, "" );
 
       $font = $p->load_font( "Helvetica-Bold", "iso8859-1", "" );
 
-      $p->setfont( $font, 16 );
-      $p->set_text_pos( 30, 750 );
-      $p->show( "Factura" );
+      $p->setfont( $font, 12 );
+
+      $p->fit_textline( "Factura", 30, 750, "fontsize=16 position=left" );
+
+      // Serie
+      if ( isset( $data['serie'] ) ) {
+        $p->fit_textline( "Serie: ", 120, 765,
+                          "fontsize=8 fillcolor={rgb 0.6 0.3 0.6} ".
+                          "position={bottom left} boxsize={25 10}" );
+        $p->fit_textline( $data['serie'], 145, 765,
+                    "fontsize=8 ".
+                    "position={bottom left} boxsize={60 10}" );
+      }
+      // Folio
+      $p->fit_textline( "Folio: ", 120, 750,
+                        "fontsize=8 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={25 10}" );
+      $p->fit_textline( $data['folio'], 145, 750,
+                        "fontsize=8 ".
+                        "position={bottom left} boxsize={90 10}" );
+      // AnoAprobacion
+      $p->fit_textline( self::encText( "Año de Aprobación: " ), 250, 765,
+                        "fontsize=8 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={80 10}" );
+      $p->fit_textline( $data['anoAprobacion'], 330, 765,
+                        "fontsize=8 ".
+                        "position={bottom left} boxsize={20 10}" );
+      // NoAprobacion
+      $p->fit_textline( self::encText( "Número de Aprobación: " ), 250, 750,
+                        "fontsize=8 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={95 10}" );
+      $p->fit_textline( $data['noAprobacion'], 345, 750,
+                        "fontsize=8 ".
+                        "position={bottom left} boxsize={65 10}" );
+      // Fecha
+      $p->fit_textline( "Fecha:", 425, 750,
+                        "fontsize=8 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={30 10}" );
+      $p->fit_textline( $data['fecha'], 455, 750,
+                        "fontsize=8 ".
+                        "position={bottom left} boxsize={80 10}" );
+
+      // line
+      $p->moveto( 30, 740 );
+      $p->lineto( 580, 740);
+      $p->stroke();
+
+      $p->setlinewidth( 0.5 );
 
       // Emisor
-      $p->setfont( $font, 18 );
-      $p->set_text_pos( 30, 710 );
-      $p->show( self::encodeText( $data['Emisor']['nombre'] ) );
+      $p->fit_textline( "Emisor", 30, 720,
+                        "fontsize=10 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom left} boxsize={200 20}" );
 
-      $p->setfont( $font, 14 );
-      $p->set_text_pos( 30, 680 );
-      $p->show( "RFC: ".self::encodeText( $data['Emisor']['rfc'] ) );
+      $p->fit_textline( self::encText( $data['Emisor']['nombre'] ), 30, 695,
+                        "fontsize=18 ".
+                        "position={bottom left} boxsize={270 20}" );
 
-      $p->setfont( $font, 12 );
-      $p->set_text_pos( 30, 660 );
-      $p->show( self::encodeText( $data['DomicilioFiscal']['calle']." No. ".
-                                  $data['DomicilioFiscal']['noExterior'] ) );
+      $p->fit_textline( "RFC: ".$data['Emisor']['rfc'], 30, 675,
+                        "fontsize=14 ".
+                        "position={bottom left} boxsize={270 15}" );
 
-      $p->setfont( $font, 12 );
-      $p->set_text_pos( 30, 645 );
-      $p->show( self::encodeText( $data['DomicilioFiscal']['colonia'] ) );
+      $p->fit_textline( self::encText( $data['DomicilioFiscal']['calle']." No. ".
+                                       $data['DomicilioFiscal']['noExterior'] ),
+                        30, 660, "fontsize=12 ".
+                        "position={bottom left} boxsize={270 10}" );
 
-      $p->setfont( $font, 12 );
-      $p->set_text_pos( 30, 630 );
-      $p->show( self::encodeText( $data['DomicilioFiscal']['municipio'] ) );
+      $p->fit_textline( self::encText( $data['DomicilioFiscal']['colonia'] ),
+                        30, 645, "fontsize=12 ".
+                        "position={bottom left} boxsize={270 10}" );
 
-      $p->setfont( $font, 12 );
-      $p->set_text_pos( 30, 615 );
-      $p->show( "C.P. ".$data['DomicilioFiscal']['codigoPostal'] );
+      $p->fit_textline( self::encText( $data['DomicilioFiscal']['municipio'] ),
+                        30, 630, "fontsize=12 ".
+                        "position={bottom left} boxsize={270 10}" );
 
-      $p->setfont( $font, 12 );
-      $p->set_text_pos( 30, 600 );
-      $p->show( self::encodeText( $data['DomicilioFiscal']['estado'] ) );
+      $p->fit_textline( "C.P. ".$data['DomicilioFiscal']['codigoPostal'],
+                        30, 615, "fontsize=12 ".
+                        "position={bottom left} boxsize={270 10}" );
 
-      // Datos fiscales
-      $p->fit_textline( "Folio Fiscal:", 577, 762,
-                        "fontsize=10 position=right" );
-
-      $p->fit_textline( "No. de Serie del Certificado del SAT:", 577, 723,
-                        "fontsize=10 position=right" );
-
-      $p->fit_textline( $data['noCertificado'], 577, 708,
-                        "fontsize=9 position=right" );
-
-      $p->fit_textline( self::encodeText( "Fecha y hora de certificación:" ), 577, 684,
-                        "fontsize=10 position=right" );
+      $p->fit_textline( self::encText( $data['DomicilioFiscal']['estado'] ),
+                        30, 600, "fontsize=12 ".
+                        "position={bottom left} boxsize={270 10}" );
 
       // Receptor
-      $p->setfont( $font, 14 );
-      $p->set_text_pos( 30, 550 );
-      $p->show( "Receptor:" );
+      $p->fit_textline( "Receptor", 380, 720,
+                        "fontsize=10 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={200 20}" );
 
-      $p->setfont( $font, 13 );
-      $p->set_text_pos( 30, 525 );
-      $p->show( "RFC: ".self::encodeText( $data['Receptor']['rfc'] ) );
+      $p->fit_textline( self::encText( $data['Receptor']['nombre'] ), 310, 695,
+                        "fontsize=18 ".
+                        "position={bottom right} boxsize={270 20}" );
+
+      $p->fit_textline( "RFC: ".$data['Receptor']['rfc'], 310, 675,
+                        "fontsize=14 ".
+                        "position={bottom right} boxsize={270 15}" );
+
+      $p->fit_textline( self::encText( $data['Domicilio']['calle']." No. ".
+                                       $data['Domicilio']['noExterior'] ),
+                        310, 660, "fontsize=12 ".
+                        "position={bottom right} boxsize={270 10}" );
+
+      $p->fit_textline( self::encText( $data['Domicilio']['colonia'] ),
+                        310, 645, "fontsize=12 ".
+                        "position={bottom right} boxsize={270 10}" );
+
+      $p->fit_textline( self::encText( $data['Domicilio']['municipio'] ),
+                        310, 630, "fontsize=12 ".
+                        "position={bottom right} boxsize={270 10}" );
+
+      $p->fit_textline( "C.P. ".$data['Domicilio']['codigoPostal'],
+                        310, 615, "fontsize=12 ".
+                        "position={bottom right} boxsize={270 10}" );
+
+      $p->fit_textline( self::encText( $data['Domicilio']['estado'] ),
+                        310, 600, "fontsize=12 ".
+                        "position={bottom right} boxsize={270 10}" );
+
+      // line
+      $p->moveto( 30, 585 );
+      $p->lineto( 580, 585);
+      $p->stroke();
+
+
+      // Concepto
+      
+      /*$count = count( $data['Concepto'] );
+      if ( $count > 1 ) {
+        for ( $i = 0; $i < $count; ++$i ) {
+
+        }
+      }*/
+
 
       $p->end_page_ext( "" );
 
@@ -121,7 +202,7 @@ class SimpleCFD {
       print $buf;
 
     } catch ( PDFlibException $e ) {
-      die( "PDFlib exception occurred in hello sample:\n" .
+      die( "PDFlib exception occurred in Factura:\n" .
       "[" . $e->get_errnum() . "] " . $e->get_apiname() . ": " .
       $e->get_errmsg() . "\n");
     } catch ( Exception $e ) {
