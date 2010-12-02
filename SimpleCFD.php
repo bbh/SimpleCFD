@@ -234,67 +234,85 @@ class SimpleCFD {
       $p->lineto( 470, $pos - 10 );
       $p->stroke();
 
-      // line importe
-      $p->moveto( 530, 580 );
-      $p->lineto( 530, $pos - 90 );
-      $p->stroke();
-
       // line
       $p->moveto( 30, $pos - 20 );
       $p->lineto( 580, $pos - 20 );
       $p->stroke();
 
-
-      // title Subtotal
-      $p->fit_textline( "SubTotal",
-                        375, $pos-40, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
-                        "position={bottom right} boxsize={145 10}" );
-      // title Impuesto
-      $p->fit_textline( $data['Traslado'][0]['impuesto'],
-                        375, $pos-60, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
-                        "position={bottom right} boxsize={145 10}" );
-      // title Total
-      $p->fit_textline( "Total",
-                        375, $pos-80, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
-                        "position={bottom right} boxsize={145 10}" );
-
       // Subtotal
+      $pos -= 40;
+      $p->fit_textline( "SubTotal",
+                        375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={145 10}" );
       $p->fit_textline( $data['subTotal'],
-                        540, $pos-40, "fontsize=9 ".
+                        540, $pos, "fontsize=9 ".
                         "position={bottom left} boxsize={145 10}" );
-      // Impuesto
-      $count = count( $data['Traslado'] );
-      for ( $i = 0; $i < $count; ++$i ) {
-        $p->fit_textline( $data['Traslado'][$i]['importe'],
-                          540, $pos - 60, "fontsize=9 ".
-                          "position={bottom left} boxsize={145 10}" );
+
+      // Traslado
+      if ( isset( $data['Traslado'] ) ) {
+        $count = count( $data['Traslado'] );
+        for ( $i = 0; $i < $count; ++$i ) {
+          $pos -= 20;
+          $p->fit_textline( $data['Traslado'][$i]['impuesto'], 375, $pos,
+                            "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                            "position={bottom right} boxsize={145 10}" );
+          $p->fit_textline( " (Tasa: ".$data['Traslado'][$i]['tasa']."%)",
+                            357, $pos+1, "fontsize=6 fillcolor={rgb 0.6 0.3 0.6} ".
+                            "position={bottom right} boxsize={145 10}" );
+          $p->fit_textline( $data['Traslado'][$i]['importe'], 540, $pos,
+                            "fontsize=9 position={bottom left} boxsize={145 10}" );
+        }
+      }
+      // Retencion
+      if ( isset( $data['Retencion'] ) ) {
+        $count = count( $data['Retencion'] );
+        for ( $i = 0; $i < $count; ++$i ) {
+          $pos -= 20;
+          $p->fit_textline( $data['Retencion'][$i]['impuesto'],
+                            375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                            "position={bottom right} boxsize={145 10}" );
+          $p->fit_textline( $data['Retencion'][$i]['importe'],
+                            540, $pos, "fontsize=9 ".
+                            "position={bottom left} boxsize={145 10}" );
+        }
       }
 
       // Total
-      $p->fit_textline( $data['total'],
-                        540, $pos - 80, "fontsize=9 ".
+      $pos -= 20;
+      $p->fit_textline( "Total",
+                        375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={145 10}" );
+      $p->fit_textline( $data['total'], 540, $pos, "fontsize=9 ".
                         "position={bottom left} boxsize={145 10}" );
 
+      // line importe
+      $pos -= 10;
+      $p->moveto( 530, 580 );
+      $p->lineto( 530, $pos );
+      $p->stroke();
+
       // line
-      $p->moveto( 30, $pos - 100 );
-      $p->lineto( 580, $pos - 100 );
+      $pos -= 10;
+      $p->moveto( 30, $pos );
+      $p->lineto( 580, $pos );
       $p->stroke();
 
       // noCertificado
+      $pos -= 20;
       $p->fit_textline( self::encText( "Número de Serie del Certificado:" ),
-                        30, $pos-120, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        30, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={145 10}" );
-      $p->fit_textline( self::encText( $data['noCertificado'] ), 175, $pos-120,
+      $p->fit_textline( self::encText( $data['noCertificado'] ), 175, $pos,
                         "fontsize=9 position={bottom left} boxsize={100 10}" );
 
       // cadenaOriginal
-      $p->fit_textline( "Cadena original:", 30, $pos-140,
+      $p->fit_textline( "Cadena original:", 30, $pos-20,
                         "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={75 10}" );
       $cad = explode( ":::", wordwrap( self::encText( $data['cadenaOriginal'] ),
                                        150, ":::", true ) );
       $count = count( $cad );
-      $position_cad = $pos - 140;
+      $position_cad = $pos - 20;
       for ( $i = 0; $i < $count; ++$i ) {
         $position_cad -= 10;
         $p->fit_textline( $cad[$i], 30, $position_cad,
