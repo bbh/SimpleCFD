@@ -20,6 +20,7 @@
  * SimpleCFD provides static methods to process a Comprobante Fiscal Digital
  * also named as Factura Electronica.
  *
+ * @version 0.2
  * @author Basilio Brice&ntilde;o Hern&aacute;ndez <bbh@tlalokes.org>
  * @copyright Copyright &copy; 2010 Basilio Brice&ntilde;o Hern&aacute;ndez
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
@@ -182,25 +183,16 @@ class SimpleCFD {
       // Cantidad
       $p->fit_textline( "Cantidad", 30, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={50 10}" );
-      // line
-      $p->moveto( 90, 580 );
-      $p->lineto( 90, 350);
-      $p->stroke();
+
       // Descripcion
       $p->fit_textline( self::encText( "Descripción" ), 100, 565,
                         "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={65 10}" );
-      // line
-      $p->moveto( 470, 580 );
-      $p->lineto( 470, 350);
-      $p->stroke();
+
       // Precio
       $p->fit_textline( "Precio", 483, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={35 10}" );
-      // line
-      $p->moveto( 530, 580 );
-      $p->lineto( 530, 350);
-      $p->stroke();
+
       // Importe
       $p->fit_textline( "Importe", 540, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={40 10}" );
@@ -210,33 +202,99 @@ class SimpleCFD {
       $p->lineto( 580, 555);
       $p->stroke();
 
-      /*$count = count( $data['Concepto'] );
-      if ( $count > 1 ) {
-        for ( $i = 0; $i < $count; ++$i ) {
+      $count = count( $data['Concepto'] );
+      static $pos = 552;
+      for ( $i = 0; $i < $count; ++$i ) {
+        $pos -= 20;
+        // Cantidad
+        $p->fit_textline( $data['Concepto'][$i]['cantidad'],
+                          30, $pos, "fontsize=9 ".
+                          "position={bottom left} boxsize={145 10}" );
+        // Descripcion
+        $p->fit_textline( $data['Concepto'][$i]['descripcion'],
+                          100, $pos, "fontsize=9 ".
+                          "position={bottom left} boxsize={145 10}" );
+        // Valor unitario
+        $p->fit_textline( $data['Concepto'][$i]['valorUnitario'],
+                          483, $pos, "fontsize=9 ".
+                          "position={bottom left} boxsize={145 10}" );
+        // Importe
+        $p->fit_textline( $data['Concepto'][$i]['importe'],
+                          540, $pos, "fontsize=9 ".
+                          "position={bottom left} boxsize={145 10}" );
+      }
 
-        }
-      }*/
+      // line cantidad
+      $p->moveto( 90, 580 );
+      $p->lineto( 90, $pos - 10 );
+      $p->stroke();
+
+      // line descripcion
+      $p->moveto( 470, 580 );
+      $p->lineto( 470, $pos - 10 );
+      $p->stroke();
+
+      // line importe
+      $p->moveto( 530, 580 );
+      $p->lineto( 530, $pos - 90 );
+      $p->stroke();
 
       // line
-      $p->moveto( 30, 345 );
-      $p->lineto( 580, 345);
+      $p->moveto( 30, $pos - 20 );
+      $p->lineto( 580, $pos - 20 );
+      $p->stroke();
+
+
+      // title Subtotal
+      $p->fit_textline( "SubTotal",
+                        375, $pos-40, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={145 10}" );
+      // title Impuesto
+      $p->fit_textline( $data['Traslado'][0]['impuesto'],
+                        375, $pos-60, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={145 10}" );
+      // title Total
+      $p->fit_textline( "Total",
+                        375, $pos-80, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        "position={bottom right} boxsize={145 10}" );
+
+      // Subtotal
+      $p->fit_textline( $data['subTotal'],
+                        540, $pos-40, "fontsize=9 ".
+                        "position={bottom left} boxsize={145 10}" );
+      // Impuesto
+      $count = count( $data['Traslado'] );
+      for ( $i = 0; $i < $count; ++$i ) {
+        $p->fit_textline( $data['Traslado'][$i]['importe'],
+                          540, $pos - 60, "fontsize=9 ".
+                          "position={bottom left} boxsize={145 10}" );
+      }
+
+      // Total
+      $p->fit_textline( $data['total'],
+                        540, $pos - 80, "fontsize=9 ".
+                        "position={bottom left} boxsize={145 10}" );
+
+      // line
+      $p->moveto( 30, $pos - 100 );
+      $p->lineto( 580, $pos - 100 );
       $p->stroke();
 
       // noCertificado
       $p->fit_textline( self::encText( "Número de Serie del Certificado:" ),
-                        30, 325, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        30, $pos-120, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={145 10}" );
-      $p->fit_textline( self::encText( $data['noCertificado'] ), 175, 325,
+      $p->fit_textline( self::encText( $data['noCertificado'] ), 175, $pos-120,
                         "fontsize=9 position={bottom left} boxsize={100 10}" );
 
       // cadenaOriginal
-      $p->fit_textline( "Cadena original:", 30, 300,
+      $p->fit_textline( "Cadena original:", 30, $pos-140,
                         "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={75 10}" );
-      $foo = self::encText( $data['cadenaOriginal'] );
-      $cad = explode( ":::", wordwrap( $foo,150,":::",true ) );
+      $cad = explode( ":::", wordwrap( self::encText( $data['cadenaOriginal'] ),
+                                       150, ":::", true ) );
       $count = count( $cad );
-      static $position_cad = 300;
+      $position_cad = $pos - 140;
       for ( $i = 0; $i < $count; ++$i ) {
         $position_cad -= 10;
         $p->fit_textline( $cad[$i], 30, $position_cad,
@@ -262,7 +320,7 @@ class SimpleCFD {
 
       // nota
       $p->fit_textline( self::encText( "Este documento es una impresión de un ".
-                                       "comprobante fiscal digital " ), 150,
+                                       "Comprobante Fiscal Digital " ), 150,
                         $position - 30, "fontsize=10 ".
                         "position={bottom left} boxsize={320 10}" );
 
