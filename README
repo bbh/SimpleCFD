@@ -1,5 +1,5 @@
                           FacturaElectronica
-                              Version 0.1
+                              Version 0.2
 
 Copyright (C) 2010 Basilio Briceno Hernandez <bbh@tlalokes.org>
 
@@ -27,6 +27,8 @@ ON WHAT IT RUNS?
 REQUIREMENTS
 
   It requires the PHP binary extension OpenSSL and the OpenSSL program itself.
+  If you require PDF display, then install PDFlib or PDFlibLite and the PHP's
+  PDFlib binary extension from PECL.
   It has not been probed on Windows, so any information about how it works
   on that platform will be appreciated.
 
