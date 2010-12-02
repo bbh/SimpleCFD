@@ -3,14 +3,12 @@
 $password = 'a0123456789';
 $cer_path = 'aaa010101aaa_CSD_10.cer';
 $key_path = 'aaa010101aaa_CSD_10.key';
-//$noAprobacion = '';
-//$anoAprobacion = '';
 
 // set CDF array
-$array['serie'] = 'A';
-//$array['noAprobacion'] = $noAprobacion;
-//$array['anoAprobacion'] = $anoAprobacion;
-$array['folio'] = '1'; // Long: 1 - 20
+$array['serie'] = 'AAAAAAAAAA';
+$array['noAprobacion'] = "00000000000000";
+$array['anoAprobacion'] = "2010";
+$array['folio'] = '00000000000000000000';
 $array['fecha'] = '2010-11-25T16:30:00'; // ISO 8601 aaaa-mm-ddThh:mm:ss
 $array['formaDePago'] = 'Pago en una sola exhibición'; // Pago en una sola exibición | Parcialidad 1 de X.
 $array['tipoDeComprobante'] = 'ingreso'; // ingreso | egreso | traslado
@@ -52,8 +50,15 @@ $array['Concepto'][1]['valorUnitario'] = 400;
 $array['Concepto'][1]['importe'] = 400;
 
 $array['subTotal'] = 700;
-$array['Retencion'][0]['impuesto'] = 'IVA';
-$array['Retencion'][0]['importe'] = 112;
+
+//$array['Retencion'][0]['impuesto'] = 'IVA';
+//$array['Retencion'][0]['importe'] = 112;
+//$array['Retencion'][1]['impuesto'] = 'ISR';
+//$array['Retencion'][1]['importe'] = 70;
+$array['Traslado'][0]['impuesto'] = 'IVA';
+$array['Traslado'][0]['tasa'] = '16.00';
+$array['Traslado'][0]['importe'] = 112;
+
 //$array['descuento'] = '';
 $array['total'] = 812;
 
@@ -61,12 +66,15 @@ $array['total'] = 812;
 // calls SimpleCDF methods
 require_once '../SimpleCFD.php';
 
+$array['cadenaOriginal'] = SimpleCFD::getOriginalString( $array );
 $array['sello'] = SimpleCFD::signData( SimpleCFD::getPrivateKey( $key_path, $password ),
                                        SimpleCFD::getOriginalString( $array ) );
 $array['noCertificado'] = SimpleCFD::getSerialFromCertificate( $cer_path );
 $array['certificado'] = SimpleCFD::getCertificate( $cer_path, false );
 
-// prints the XML result
+// return the CDF as XML
 echo SimpleCFD::getXML( $array );
+
+// returns the CFD as PDF
 //echo SimpleCFD::getPDF( $array );
 ?>
