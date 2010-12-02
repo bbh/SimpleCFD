@@ -27,13 +27,26 @@
  */
 class SimpleCFD {
 
+  /**
+   * Encodes data from UTF-8 to ISO-8859-1 throw HTML entities
+   *
+   * @param string $text
+   * @return string
+   */
   private static function encText( $text )
   {
     return html_entity_decode( htmlentities( $text, ENT_QUOTES, 'UTF-8' ),
                                ENT_QUOTES, 'ISO-8859-1' );
   }
 
-  public static function getPDF ( array &$data )
+  /**
+   * Returns the CFD as PDF
+   *
+   * @param array $data the CFD array
+   * @param boolean $print_headers if set true, it prints the PDF directly
+   * @return mixed
+   */
+  public static function getPDF ( array &$data, $print_headers = false )
   {
     try {
       $p = new PDFlib();
@@ -336,7 +349,7 @@ class SimpleCFD {
       unset( $count );
       unset( $cer );
 
-      // nota
+      // note CFD
       $p->fit_textline( self::encText( "Este documento es una impresión de un ".
                                        "Comprobante Fiscal Digital " ), 150,
                         $position - 30, "fontsize=10 ".
@@ -347,22 +360,26 @@ class SimpleCFD {
       $p->end_document( "" );
 
       $buf = $p->get_buffer();
-      $len = strlen( $buf );
 
-      header( "Content-type: application/pdf" );
-      header( "Content-Length: $len" );
-      header( "Content-Disposition: inline; filename=hello.pdf" );
+      unset( $p );
 
-      print $buf;
+      if ( $print_headers ) {
+        $len = strlen( $buf );
+        header( "Content-type: application/pdf" );
+        header( "Content-Length: $len" );
+        header( "Content-Disposition: inline; filename=hello.pdf" );
+        echo $buf;
+        exit;
+      }
+
+      return $buf;
 
     } catch ( PDFlibException $e ) {
-      die( "PDFlib exception occurred in Factura:\n" .
-      "[" . $e->get_errnum() . "] " . $e->get_apiname() . ": " .
-      $e->get_errmsg() . "\n");
+      die( "PDFlib exception occurred in Factura:\n" . "[" . $e->get_errnum() .
+           "] " . $e->get_apiname() . ": " . $e->get_errmsg() . "\n" );
     } catch ( Exception $e ) {
-        die( $e );
+      die( $e );
     }
-    unset( $p );
   }
 
   /**
