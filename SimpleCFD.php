@@ -20,7 +20,7 @@
  * SimpleCFD provides static methods to process a Comprobante Fiscal Digital
  * also named as Factura Electronica.
  *
- * @version 0.2
+ * @version 0.3
  * @author Basilio Brice&ntilde;o Hern&aacute;ndez <bbh@tlalokes.org>
  * @copyright Copyright &copy; 2010 Basilio Brice&ntilde;o Hern&aacute;ndez
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
@@ -131,10 +131,13 @@ class SimpleCFD {
                         "fontsize=14 ".
                         "position={bottom left} boxsize={270 15}" );
 
-      $p->fit_textline( self::encText( $data['DomicilioFiscal']['calle']." No. ".
-                                       $data['DomicilioFiscal']['noExterior'] ),
-                        30, 660, "fontsize=12 ".
+      $domicilio = self::encText( $data['DomicilioFiscal']['calle'] )." No. ".
+                   $data['DomicilioFiscal']['noExterior'];
+      $domicilio .= isset( $data['DomicilioFiscal']['noInterior'] ) ?
+                    " - ".$data['DomicilioFiscal']['noInterior'] : '';
+      $p->fit_textline( self::encText( $domicilio ), 30, 660, "fontsize=12 ".
                         "position={bottom left} boxsize={270 10}" );
+      unset( $domicilio );
 
       $p->fit_textline( self::encText( $data['DomicilioFiscal']['colonia'] ),
                         30, 645, "fontsize=12 ".
@@ -165,10 +168,13 @@ class SimpleCFD {
                         "fontsize=14 ".
                         "position={bottom right} boxsize={270 15}" );
 
-      $p->fit_textline( self::encText( $data['Domicilio']['calle']." No. ".
-                                       $data['Domicilio']['noExterior'] ),
-                        310, 660, "fontsize=12 ".
+      $domicilio = self::encText( $data['Domicilio']['calle'] )." No. ".
+                   $data['Domicilio']['noExterior'];
+      $domicilio .= isset( $data['Domicilio']['noInterior'] ) ?
+                    " - ".$data['Domicilio']['noInterior'] : '';
+      $p->fit_textline( $domicilio, 310, 660, "fontsize=12 ".
                         "position={bottom right} boxsize={270 10}" );
+      unset( $domicilio );
 
       $p->fit_textline( self::encText( $data['Domicilio']['colonia'] ),
                         310, 645, "fontsize=12 ".
@@ -233,8 +239,8 @@ class SimpleCFD {
                           "position={bottom left} boxsize={145 10}" );
         // Importe
         $p->fit_textline( $data['Concepto'][$i]['importe'],
-                          540, $pos, "fontsize=9 ".
-                          "position={bottom left} boxsize={145 10}" );
+                          435, $pos, "fontsize=9 ".
+                          "position={bottom right} boxsize={145 10}" );
       }
 
       // line cantidad
@@ -258,8 +264,8 @@ class SimpleCFD {
                         375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom right} boxsize={145 10}" );
       $p->fit_textline( $data['subTotal'],
-                        540, $pos, "fontsize=9 ".
-                        "position={bottom left} boxsize={145 10}" );
+                        435, $pos, "fontsize=9 ".
+                        "position={bottom right} boxsize={145 10}" );
 
       // Traslado
       if ( isset( $data['Traslado'] ) ) {
@@ -272,8 +278,9 @@ class SimpleCFD {
           $p->fit_textline( " (Tasa: ".$data['Traslado'][$i]['tasa']."%)",
                             357, $pos+1, "fontsize=6 fillcolor={rgb 0.6 0.3 0.6} ".
                             "position={bottom right} boxsize={145 10}" );
-          $p->fit_textline( $data['Traslado'][$i]['importe'], 540, $pos,
-                            "fontsize=9 position={bottom left} boxsize={145 10}" );
+          $p->fit_textline( $data['Traslado'][$i]['importe'],
+                            435, $pos, "fontsize=9 ".
+                            "position={bottom right} boxsize={145 10}" );
         }
       }
       // Retencion
@@ -281,12 +288,13 @@ class SimpleCFD {
         $count = count( $data['Retencion'] );
         for ( $i = 0; $i < $count; ++$i ) {
           $pos -= 20;
-          $p->fit_textline( $data['Retencion'][$i]['impuesto'],
+          $p->fit_textline( self::encText( "Retención " ).
+                            $data['Retencion'][$i]['impuesto'],
                             375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                             "position={bottom right} boxsize={145 10}" );
           $p->fit_textline( $data['Retencion'][$i]['importe'],
-                            540, $pos, "fontsize=9 ".
-                            "position={bottom left} boxsize={145 10}" );
+                            435, $pos, "fontsize=9 ".
+                            "position={bottom right} boxsize={145 10}" );
         }
       }
 
@@ -295,8 +303,8 @@ class SimpleCFD {
       $p->fit_textline( "Total",
                         375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom right} boxsize={145 10}" );
-      $p->fit_textline( $data['total'], 540, $pos, "fontsize=9 ".
-                        "position={bottom left} boxsize={145 10}" );
+      $p->fit_textline( $data['total'], 435, $pos, "fontsize=9 ".
+                        "position={bottom right} boxsize={145 10}" );
 
       // line importe
       $pos -= 10;
@@ -411,7 +419,7 @@ class SimpleCFD {
 
     $version = $dom->createAttribute( 'version' );
     $co->appendChild( $version );
-    $version->appendChild( $dom->createTextNode( '2.0' ) );
+    $version->appendChild( $dom->createTextNode( $data['version'] ) );
 
     if ( isset( $data['serie'] ) ) {
       $serie = $dom->createAttribute( 'serie' );
@@ -935,6 +943,13 @@ class SimpleCFD {
     $string .= isset( $data['folio'] ) ? $data['folio'].'|' : '';
     $string .= isset( $data['fecha'] ) ? $data['fecha'].'|' : ''; // 2010-11-24T16:30:00
     $string .= isset( $data['noAprobacion'] ) ? $data['noAprobacion'].'|' : '';
+    $string .= isset( $data['anoAprobacion'] ) ? $data['anoAprobacion'].'|' : '';
+    $string .= isset( $data['tipoDeComprobante'] ) ? $data['tipoDeComprobante'].'|' : '';
+    $string .= isset( $data['formaDePago']  ) ? $data['formaDePago'].'|' : '';
+    $string .= isset( $data['condicionesDePago']  ) ? $data['condicionesDePago'].'|' : '';
+    $string .= isset( $data['subTotal']  ) ? $data['subTotal'].'|' : '';
+    $string .= isset( $data['descuento']  ) ? $data['descuento'].'|' : '';
+    $string .= isset( $data['total']  ) ? $data['total'].'|' : '';
 
     // Emisor
     if ( !isset( $data['Emisor'] ) ) {
@@ -991,44 +1006,26 @@ class SimpleCFD {
       die( 'You must provide at least one Concepto in your array'."\n" );
     }
     $count = count( $data['Concepto'] );
-    if ( $count == 1 ) {
-      $string .= isset( $data['Concepto'][0]['cantidad'] ) ? $data['Concepto'][0]['cantidad'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['unidad'] ) ? $data['Concepto'][0]['unidad'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['noIdentificacion'] ) ? $data['Concepto'][0]['noIdentificacion'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['descripcion'] ) ? $data['Concepto'][0]['descripcion'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['valorUnitario'] ) ? $data['Concepto'][0]['valorUnitario'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['importe'] ) ? $data['Concepto'][0]['importe'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['InformacionAduanera']['numero'] ) ? $data['Concepto'][0]['InformacionAduanera']['numero'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['InformacionAduanera']['fecha'] ) ? $data['Concepto'][0]['InformacionAduanera']['fecha'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['InformacionAduanera']['aduana'] ) ? $data['Concepto'][0]['InformacionAduanera']['aduana'].'|' : '';
-      $string .= isset( $data['Concepto'][0]['CuentaPredial']['numero'] ) ? $data['Concepto'][0]['CuentaPredial']['numero'].'|' : '';
-    } else {
-      for( $i = 0; $i < $count; ++$i ) {
-        $string .= isset( $data['Concepto'][$i]['cantidad'] ) ? $data['Concepto'][$i]['cantidad'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['unidad'] ) ? $data['Concepto'][$i]['unidad'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['noIdentificacion'] ) ? $data['Concepto'][$i]['noIdentificacion'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['descripcion'] ) ? $data['Concepto'][$i]['descripcion'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['valorUnitario'] ) ? $data['Concepto'][$i]['valorUnitario'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['importe'] ) ? $data['Concepto'][$i]['importe'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['numero'] ) ? $data['Concepto'][$i]['InformacionAduanera']['numero'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['fecha'] ) ? $data['Concepto'][$i]['InformacionAduanera']['fecha'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['aduana'] ) ? $data['Concepto'][$i]['InformacionAduanera']['aduana'].'|' : '';
-        $string .= isset( $data['Concepto'][$i]['CuentaPredial']['numero'] ) ? $data['Concepto'][$i]['CuentaPredial']['numero'].'|' : '';
-      }
+    for( $i = 0; $i < $count; ++$i ) {
+      $string .= isset( $data['Concepto'][$i]['cantidad'] ) ? $data['Concepto'][$i]['cantidad'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['unidad'] ) ? $data['Concepto'][$i]['unidad'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['noIdentificacion'] ) ? $data['Concepto'][$i]['noIdentificacion'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['descripcion'] ) ? $data['Concepto'][$i]['descripcion'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['valorUnitario'] ) ? $data['Concepto'][$i]['valorUnitario'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['importe'] ) ? $data['Concepto'][$i]['importe'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['numero'] ) ? $data['Concepto'][$i]['InformacionAduanera']['numero'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['fecha'] ) ? $data['Concepto'][$i]['InformacionAduanera']['fecha'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['InformacionAduanera']['aduana'] ) ? $data['Concepto'][$i]['InformacionAduanera']['aduana'].'|' : '';
+      $string .= isset( $data['Concepto'][$i]['CuentaPredial']['numero'] ) ? $data['Concepto'][$i]['CuentaPredial']['numero'].'|' : '';
     }
     unset( $count );
 
     // Retencion
     if ( isset( $data['Retencion'] ) ) {
       $count = count( $data['Retencion'] );
-      if ( $count == 2 ) {
-        $string .= isset( $data['Retencion'][0]['impuesto'] ) ? $data['Retencion'][0]['impuesto'].'|' : '';
-        $string .= isset( $data['Retencion'][0]['importe'] ) ? $data['Retencion'][0]['importe'].'|' : '';
-      } else {
-        for( $i = 0; $i < $count; ++$i ) {
-          $string .= isset( $data['Retencion'][$i]['impuesto'] ) ? $data['Retencion'][$i]['impuesto'].'|' : '';
-          $string .= isset( $data['Retencion'][$i]['importe'] ) ? $data['Retencion'][$i]['importe'].'|' : '';
-        }
+      for( $i = 0; $i < $count; ++$i ) {
+        $string .= isset( $data['Retencion'][$i]['impuesto'] ) ? $data['Retencion'][$i]['impuesto'].'|' : '';
+        $string .= isset( $data['Retencion'][$i]['importe'] ) ? $data['Retencion'][$i]['importe'].'|' : '';
       }
       unset( $count );
       $string .= isset( $data['Retencion']['totalImpuestosRetenidos'] ) ? $data['Retencion']['totalImpuestosRetenidos'].'|' : '';
@@ -1037,16 +1034,10 @@ class SimpleCFD {
     // Traslado
     if ( isset( $data['Traslado'] ) ) {
       $count = count( $data['Traslado'] );
-      if ( $count == 2 ) {
-        $string .= isset( $data['Traslado'][0]['Impuesto'] ) ? $data['Traslado'][0]['Impuesto'].'|' : '';
-        $string .= isset( $data['Traslado'][0]['tasa'] ) ? $data['Traslado'][0]['tasa'].'|' : '';
-        $string .= isset( $data['Traslado'][0]['importe'] ) ? $data['Traslado'][0]['importe'].'|' : '';
-      } else {
-        for( $i = 0; $i < $count; ++$i ) {
-          $string .= isset( $data['Traslado'][$i]['Impuesto'] ) ? $data['Traslado'][$i]['Impuesto'].'|' : '';
-          $string .= isset( $data['Traslado'][$i]['tasa'] ) ? $data['Traslado'][$i]['tasa'].'|' : '';
-          $string .= isset( $data['Traslado'][$i]['importe'] ) ? $data['Traslado'][$i]['importe'].'|' : '';
-        }
+      for( $i = 0; $i < $count; ++$i ) {
+        $string .= isset( $data['Traslado'][$i]['impuesto'] ) ? $data['Traslado'][$i]['impuesto'].'|' : '';
+        $string .= isset( $data['Traslado'][$i]['tasa'] ) ? $data['Traslado'][$i]['tasa'].'|' : '';
+        $string .= isset( $data['Traslado'][$i]['importe'] ) ? $data['Traslado'][$i]['importe'].'|' : '';
       }
       unset( $count );
       $string .= isset( $data['Traslado']['totalImpuestosTraslados'] ) ? $data['Traslado']['totalImpuestosTraslados'].'|' : '';
