@@ -5,12 +5,13 @@ $cer_path = 'aaa010101aaa_CSD_10.cer';
 $key_path = 'aaa010101aaa_CSD_10.key';
 
 // set CDF array
+$array['version'] = '2.0';
 $array['serie'] = 'AAAAAAAAAA';
 $array['noAprobacion'] = "00000000000000";
 $array['anoAprobacion'] = "2010";
 $array['folio'] = '00000000000000000000';
 $array['fecha'] = '2010-11-25T16:30:00'; // ISO 8601 aaaa-mm-ddThh:mm:ss
-$array['formaDePago'] = 'Pago en una sola exhibición'; // Pago en una sola exibición | Parcialidad 1 de X.
+$array['formaDePago'] = 'Una sola exhibición'; // Pago en una sola exibición | Parcialidad 1 de X.
 $array['tipoDeComprobante'] = 'ingreso'; // ingreso | egreso | traslado
 
 $array['Emisor']['rfc'] = 'FDTL000000XXX';
@@ -66,11 +67,11 @@ $array['total'] = 812;
 // calls SimpleCDF methods
 require_once '../SimpleCFD.php';
 
-$array['cadenaOriginal'] = SimpleCFD::getOriginalString( $array );
 $array['sello'] = SimpleCFD::signData( SimpleCFD::getPrivateKey( $key_path, $password ),
                                        SimpleCFD::getOriginalString( $array ) );
 $array['noCertificado'] = SimpleCFD::getSerialFromCertificate( $cer_path );
 $array['certificado'] = SimpleCFD::getCertificate( $cer_path, false );
+$array['cadenaOriginal'] = SimpleCFD::getOriginalString( $array );
 
 // return the CDF as XML
 echo SimpleCFD::getXML( $array );
