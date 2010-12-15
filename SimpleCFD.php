@@ -341,12 +341,12 @@ class SimpleCFD {
       }
       unset( $count );
 
-      // certificado
+      // sello
       $position_cer = $position_cad - 20;
       $p->fit_textline( "Sello Digital:", 30, $position_cer,
                         "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={60 10}" );
-      $cer = explode( ":::", wordwrap( $data['certificado'],115,":::",true ) );
+      $cer = explode( ":::", wordwrap( $data['sello'],115,":::",true ) );
       $count = count( $cer );
       $position = $position_cer;
       for ( $i = 0; $i < $count; ++$i ) {
