@@ -1105,7 +1105,8 @@ class SimpleCFD {
   {
     $pkeyid = openssl_get_privatekey( $key );
 
-    if ( openssl_sign( $data, $cryptedata, $pkeyid, OPENSSL_ALGO_MD5 ) ) {
+    // On 2011 Signing algorythm changes from MD5 to SHA1 (Thanks to eDwaRd for the reminder)
+    if ( openssl_sign( $data, $cryptedata, $pkeyid,OPENSSL_ALGO_SHA1 ) ) {
 
       openssl_free_key( $pkeyid );
 
