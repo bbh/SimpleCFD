@@ -29,14 +29,14 @@ REQUIREMENTS
   It requires the PHP binary extension OpenSSL and the OpenSSL program itself.
   If you require PDF display, then install PDFlib or PDFlibLite and the PHP's
   PDFlib binary extension from PECL.
-  It has not been probed on Windows, so any information about how it works
-  on that platform will be appreciated.
 
 DOCUMENTATION:
 
  - There is a lot of documentation available in the SAT web site
    (http://sat.gob.mx) also there is an example of how to use it in the
    directory "example".
+ - It has been probed on Windows successfuly, for more information about the
+   use on that platform contact Ricardo Morales <r.morales@grupoasd.net>.
 
 IF SOMETHING GOES WRONG:
 
@@ -44,6 +44,7 @@ IF SOMETHING GOES WRONG:
 
 CREDITS
 
+  Thanks to Ricardo Morales for the MD5 to SHA1 update and the test on Windows.
   Thanks to Edgar Garcia for optimizing the openssl code.
   Thanks to Fernando Sanchez for providing help to write this project.
   Thanks to the PHP Monterrey's User's Group for the help and fellowship.

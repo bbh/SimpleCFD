@@ -1105,7 +1105,7 @@ class SimpleCFD {
   {
     $pkeyid = openssl_get_privatekey( $key );
 
-    if ( openssl_sign( $data, $cryptedata, $pkeyid, OPENSSL_ALGO_MD5 ) ) {
+    if ( openssl_sign( $data, $cryptedata, $pkeyid, OPENSSL_ALGO_SHA1 ) ) {
 
       openssl_free_key( $pkeyid );
 
