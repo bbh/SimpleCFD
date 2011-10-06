@@ -124,7 +124,7 @@ class SimpleCFD {
                         "position={bottom left} boxsize={200 20}" );
 
       $p->fit_textline( self::encText( $data['Emisor']['nombre'] ), 30, 695,
-                        "fontsize=18 ".
+                        "fontsize=12 ".
                         "position={bottom left} boxsize={270 20}" );
 
       $p->fit_textline( "RFC: ".$data['Emisor']['rfc'], 30, 675,
@@ -161,7 +161,7 @@ class SimpleCFD {
                         "position={bottom right} boxsize={200 20}" );
 
       $p->fit_textline( self::encText( $data['Receptor']['nombre'] ), 310, 695,
-                        "fontsize=18 ".
+                        "fontsize=12 ".
                         "position={bottom right} boxsize={270 20}" );
 
       $p->fit_textline( "RFC: ".$data['Receptor']['rfc'], 310, 675,
@@ -180,17 +180,23 @@ class SimpleCFD {
                         310, 645, "fontsize=12 ".
                         "position={bottom right} boxsize={270 10}" );
 
-      $p->fit_textline( self::encText( $data['Domicilio']['municipio'] ),
-                        310, 630, "fontsize=12 ".
-                        "position={bottom right} boxsize={270 10}" );
+      if ( isset( $data['Domicilio']['municipio'] ) ) {
+
+        $p->fit_textline( self::encText( $data['Domicilio']['municipio'] ),
+                          310, 630, "fontsize=12 ".
+                          "position={bottom right} boxsize={270 10}" );
+      }
 
       $p->fit_textline( "C.P. ".$data['Domicilio']['codigoPostal'],
                         310, 615, "fontsize=12 ".
                         "position={bottom right} boxsize={270 10}" );
 
-      $p->fit_textline( self::encText( $data['Domicilio']['estado'] ),
-                        310, 600, "fontsize=12 ".
-                        "position={bottom right} boxsize={270 10}" );
+      if ( isset( $data['Domicilio']['municipio'] ) ) {
+
+        $p->fit_textline( self::encText( $data['Domicilio']['estado'] ),
+                          310, 600, "fontsize=12 ".
+                          "position={bottom right} boxsize={270 10}" );
+      }
 
       // line
       $p->moveto( 30, 585 );
@@ -209,7 +215,7 @@ class SimpleCFD {
                         "position={bottom left} boxsize={65 10}" );
 
       // Precio
-      $p->fit_textline( "Precio", 483, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
+      $p->fit_textline( "Precio", 473, 565, "fontsize=11 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom left} boxsize={35 10}" );
 
       // Importe
@@ -230,12 +236,12 @@ class SimpleCFD {
                           30, $pos, "fontsize=9 ".
                           "position={bottom left} boxsize={145 10}" );
         // Descripcion
-        $p->fit_textline( $data['Concepto'][$i]['descripcion'],
+        $p->fit_textline( self::encText( $data['Concepto'][$i]['descripcion'] ),
                           100, $pos, "fontsize=9 ".
                           "position={bottom left} boxsize={145 10}" );
         // Valor unitario
         $p->fit_textline( $data['Concepto'][$i]['valorUnitario'],
-                          483, $pos, "fontsize=9 ".
+                          463, $pos, "fontsize=9 ".
                           "position={bottom left} boxsize={145 10}" );
         // Importe
         $p->fit_textline( $data['Concepto'][$i]['importe'],
@@ -249,8 +255,8 @@ class SimpleCFD {
       $p->stroke();
 
       // line descripcion
-      $p->moveto( 470, 580 );
-      $p->lineto( 470, $pos - 10 );
+      $p->moveto( 460, 580 );
+      $p->lineto( 460, $pos - 10 );
       $p->stroke();
 
       // line
@@ -261,7 +267,7 @@ class SimpleCFD {
       // Subtotal
       $pos -= 40;
       $p->fit_textline( "SubTotal",
-                        375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        365, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom right} boxsize={145 10}" );
       $p->fit_textline( $data['subTotal'],
                         435, $pos, "fontsize=9 ".
@@ -272,11 +278,11 @@ class SimpleCFD {
         $count = count( $data['Traslado'] );
         for ( $i = 0; $i < $count; ++$i ) {
           $pos -= 20;
-          $p->fit_textline( $data['Traslado'][$i]['impuesto'], 375, $pos,
+          $p->fit_textline( $data['Traslado'][$i]['impuesto'], 365, $pos,
                             "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                             "position={bottom right} boxsize={145 10}" );
           $p->fit_textline( " (Tasa: ".$data['Traslado'][$i]['tasa']."%)",
-                            357, $pos+1, "fontsize=6 fillcolor={rgb 0.6 0.3 0.6} ".
+                            347, $pos+1, "fontsize=6 fillcolor={rgb 0.6 0.3 0.6} ".
                             "position={bottom right} boxsize={145 10}" );
           $p->fit_textline( $data['Traslado'][$i]['importe'],
                             435, $pos, "fontsize=9 ".
@@ -290,7 +296,7 @@ class SimpleCFD {
           $pos -= 20;
           $p->fit_textline( self::encText( "Retención " ).
                             $data['Retencion'][$i]['impuesto'],
-                            375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                            365, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                             "position={bottom right} boxsize={145 10}" );
           $p->fit_textline( $data['Retencion'][$i]['importe'],
                             435, $pos, "fontsize=9 ".
@@ -301,15 +307,15 @@ class SimpleCFD {
       // Total
       $pos -= 20;
       $p->fit_textline( "Total",
-                        375, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
+                        365, $pos, "fontsize=9 fillcolor={rgb 0.6 0.3 0.6} ".
                         "position={bottom right} boxsize={145 10}" );
       $p->fit_textline( $data['total'], 435, $pos, "fontsize=9 ".
                         "position={bottom right} boxsize={145 10}" );
 
       // line importe
       $pos -= 10;
-      $p->moveto( 530, 580 );
-      $p->lineto( 530, $pos );
+      $p->moveto( 520, 580 );
+      $p->lineto( 520, $pos );
       $p->stroke();
 
       // line
@@ -1026,9 +1032,9 @@ class SimpleCFD {
       for( $i = 0; $i < $count; ++$i ) {
         $string .= isset( $data['Retencion'][$i]['impuesto'] ) ? $data['Retencion'][$i]['impuesto'].'|' : '';
         $string .= isset( $data['Retencion'][$i]['importe'] ) ? $data['Retencion'][$i]['importe'].'|' : '';
+        $string .= isset( $data['Retencion'][$i]['totalImpuestosRetenidos'] ) ? $data['Retencion'][$i]['totalImpuestosRetenidos'].'|' : '';
       }
       unset( $count );
-      $string .= isset( $data['Retencion']['totalImpuestosRetenidos'] ) ? $data['Retencion']['totalImpuestosRetenidos'].'|' : '';
     }
 
     // Traslado
@@ -1038,9 +1044,9 @@ class SimpleCFD {
         $string .= isset( $data['Traslado'][$i]['impuesto'] ) ? $data['Traslado'][$i]['impuesto'].'|' : '';
         $string .= isset( $data['Traslado'][$i]['tasa'] ) ? $data['Traslado'][$i]['tasa'].'|' : '';
         $string .= isset( $data['Traslado'][$i]['importe'] ) ? $data['Traslado'][$i]['importe'].'|' : '';
+        $string .= isset( $data['Traslado'][$i]['totalImpuestosTrasladados'] ) ? $data['Traslado'][$i]['totalImpuestosTrasladados'].'|' : '';
       }
       unset( $count );
-      $string .= isset( $data['Traslado']['totalImpuestosTraslados'] ) ? $data['Traslado']['totalImpuestosTraslados'].'|' : '';
     }
 
     return preg_replace( '/(.*)\|$/', '$1', $string )."||";
